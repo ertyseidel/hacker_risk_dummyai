@@ -2,10 +2,10 @@ var http = require('http');
 var fs = require('fs');
 
 var attacked_this_turn = false;
-var board_graph = JSON.parse(fs.readFileSync("./board_graph.json", {"encoding": "utf-8"}));
+var board_graph = JSON.parse(fs.readFileSync("./board_graph.json"));
 
 var serverCreated = false;
-var serverPort = 4444;
+var serverPort = process.argv[2];
 
 var serverFunction = function (req, res) {
 	console.log("------REQUEST-----");
@@ -131,7 +131,7 @@ function isCardSet(set){
 	return(set[0].value == set[1].value == set[2].value || set[0].value != set[1].value != set[2].value);
 }
 
-function doAction(you, game){
+function chooseAction(you, game){
 	for(var i = 0; i < you.available_actions.length; i++){
 		if(you.available_actions[i] == "choose_country"){
 			return "choose_country";
@@ -174,14 +174,3 @@ function doAction(you, game){
 
 http.createServer(serverFunction).listen(serverPort);
 console.log("Server started on port " + serverPort);
-
-process.on('uncaughtException', function(err) {
-	if(err.errno === 'EADDRINUSE'){
-		console.log("Couldn't start on port " + serverPort + ". Incrementing...");
-		serverPort ++;
-		http.createServer(serverFunction).listen(serverPort);
-		console.log("Server started on port " + serverPort);
-	} else{
-		process.exit(1);
-	}
-});
