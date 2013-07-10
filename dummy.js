@@ -50,11 +50,12 @@ function respond(req, res){
 			for(var i in game.continents){
 				for(var j in game.continents[i].countries){
 					if(game.continents[i].countries[j].owner === null){
+						game.continents[i].countries[j].name = j;
 						countries.push(game.continents[i].countries[j]);
 					}
 				}
 			}
-			response.data = countries[Math.floor(Math.random()*countries.length)];
+			response.data = countries[Math.floor(Math.random()*countries.length)].name;
 		} else if(action == "use_cards"){
 			response.data = findCards(you.cards, []);
 		} else if(action == "attack"){
@@ -70,6 +71,7 @@ function respond(req, res){
 		} else if(action == "end turn" || action == "pass"){
 			//pass
 		}
+		console.log("Response: " + JSON.stringify(response));
 		res.end(JSON.stringify(response));
 	} else{
 		console.log("Got a request for " + req.url + ". Responding with nothing.");
