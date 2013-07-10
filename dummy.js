@@ -9,6 +9,24 @@ var serverPort = process.argv[2];
 
 var serverFunction = function (req, res) {
 	console.log("------REQUEST-----");
+	var body = '';
+
+	if(req.method == "POST"){
+		req.on('data', function(chunk) {
+			body += chunk;
+		});
+
+		req.on('end', function() {
+			body = JSON.parse(decodeURIComponent(body).substring(5).replace(/\+/g, " "));
+			req.body = body;
+			respond(req, res);
+		});
+	} else{
+		respond(req, res);
+	}
+};
+
+function respond(req, res){
 	if(req.url == "/status"){
 		console.log("Replying to Status - 200");
 		res.writeHead(200);
@@ -18,8 +36,8 @@ var serverFunction = function (req, res) {
 	if(req.url == "/turn"){
 		console.log("It's my turn!");
 		res.writeHead(200, {'Content-Type': 'text/json'});
-		var game = req.game;
-		var you = req.you;
+		var game = req.body.game;
+		var you = req.body.you;
 
 		var action = chooseAction(you, game);
 
@@ -58,7 +76,7 @@ var serverFunction = function (req, res) {
 		res.writeHead(200);
 		res.end("");
 	}
-};
+}
 
 function getOurCountriesWithMoreThanOneTroop(game){
 	var our_countries = {};
