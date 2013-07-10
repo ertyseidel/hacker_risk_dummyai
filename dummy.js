@@ -56,6 +56,8 @@ function respond(req, res){
 				}
 			}
 			response.data = countries[Math.floor(Math.random()*countries.length)].name;
+		} else if(action == "deploy_troops"){
+			//TODO START HERE
 		} else if(action == "use_cards"){
 			response.data = findCards(you.cards, []);
 		} else if(action == "attack"){
