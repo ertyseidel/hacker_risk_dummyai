@@ -67,7 +67,7 @@ function respond(req, res){
 			var countries_to_deploy_to = {};
 			var my_countries = getOurCountries(game, 0);
 			for(var k = 0; k < you.troops_to_deploy; k++){
-				var country_choice = my_countries[Object.keys(my_countries)[Math.floor(Math.random() * Object.keys(my_countries).length)]];
+				var country_choice = Object.keys(my_countries)[Math.floor(Math.random() * Object.keys(my_countries).length)];
 				if(typeof(countries_to_deploy_to[country_choice]) == "undefined"){
 					countries_to_deploy_to[country_choice] = 1;
 				} else{
@@ -133,16 +133,17 @@ function findAttack(game){
 	var our_countries = getOurCountries(game, 2);
 	var enemy_countries = []; //enemy countries
 	for(var enemy_country_index in board_graph_countries){
-		if(typeof(our_countries[board_graph_countries[enemy_country_index]]) == "undefined"){
-			enemy_countries.push(our_countries[board_graph_countries[enemy_country_index]]);
+		if(typeof(our_countries[enemy_country_index]) == "undefined"){
+			board_graph_countries[enemy_country_index].name = enemy_country_index;
+			enemy_countries.push(board_graph_countries[enemy_country_index]);
 		}
 	}
 	var response = false;
 	while(response === false){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
-		for(var border_country_index = 0; border_country_index < enemy_countries[enemy_country_index].border_countries.length; border_country_index++){
-			if(typeof(our_countries[enemy_countries[enemy_country_index].border_countries[border_country_index]] !== "undefined")){
-				response = {"attacking_country": enemy_countries[enemy_country_index].border_countries[border_country_index], "defending_country": enemy_countries[enemy_country_index]};
+		for(var border_country_index in enemy_countries[enemy_country_index]["border countries"]){
+			if(typeof(our_countries[enemy_countries[enemy_country_index]["border countries"][border_country_index]] !== "undefined")){
+				response = {"attacking_country": enemy_countries[enemy_country_index]["border countries"][border_country_index].name, "defending_country": enemy_countries[enemy_country_index].name};
 			}
 		}
 		enemy_countries.splice(enemy_country_index, 1);
