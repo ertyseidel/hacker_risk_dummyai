@@ -50,6 +50,7 @@ function respond(req, res){
 
 		var action = chooseAction(you, game);
 
+		console.log("Available actions are " + req.body.you.available_actions);
 		console.log("Action is " + action);
 
 		var response = {"action": action, "data": {}};
@@ -83,13 +84,14 @@ function respond(req, res){
 			if(attacked_this_turn === false){
 				attacked_this_turn = findAttack(game);
 			}
+
 			response.data = {"attacking_country": attacked_this_turn["attacking_country"],
 							"defending_country": attacked_this_turn["defending_country"],
 							"attacking_troops": 1,
-							"moving_troops": game.countries[attacked_this_turn['attacking_country']].troops - 1};
+							"moving_troops": game.countries[attacked_this_turn['attacking_country']].troops - 2};
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
-		} else if(action == "end turn" || action == "pass"){
+		} else if(action == "end_turn" || action == "end_attack_phase"){
 			//pass
 		}
 		console.log("Response: " + JSON.stringify(response));
@@ -141,8 +143,9 @@ function findAttack(game){
 	while(response === false){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
 		for(var border_country_index in board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]){
-			if(typeof(our_countries[border_country_index] !== "undefined")){
-				response = {"attacking_country": board_graph_countries[enemy_countries[enemy_country_index]]["border countries"][border_country_index], "defending_country": enemy_countries[enemy_country_index]};
+			var border_country_name = board_graph_countries[enemy_countries[enemy_country_index]]["border countries"][border_country_index];
+			if(typeof(our_countries[border_country_name] !== "undefined")){
+				response = {"attacking_country": border_country_name, "defending_country": enemy_countries[enemy_country_index]};
 			}
 		}
 		enemy_countries.splice(enemy_country_index, 1);
