@@ -93,7 +93,7 @@ function respond(req, res){
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
 			response.data.moving_troops = game.countries[response.data['origin_country']].troops - 1;
-		} else if(action == "end_turn" || action == "end_attack_phase"){
+		} else if(action == "end_turn" || action == "end_attack_phase" || action == "pass"){
 			//pass
 		}
 		console.log("Response: " + JSON.stringify(response));
@@ -106,10 +106,9 @@ function respond(req, res){
 }
 
 function getMyCountries(game, min_num_troops){
-	var min_troops = typeof(min_num_troops) == "undefined" ? 0 : min_num_troops;
 	var our_countries = {};
 	for(var country_index in game.countries){
-		if(game.countries[country_index].owner == my_name && game.countries[country_index].troops >= min_troops){
+		if(game.countries[country_index].owner == my_name && game.countries[country_index].troops >= min_num_troops){
 			our_countries[country_index] = game.countries[country_index];
 			our_countries[country_index]["border countries"] = board_graph_countries[country_index]["border countries"];
 		}
@@ -124,10 +123,10 @@ function findReinforce(game){
 		for(var border_country_index in board_graph_countries[origin_country_name]["border countries"]){
 			var border_country_name = board_graph_countries[origin_country_name]["border countries"][border_country_index];
 			if(game.countries[border_country_name].owner == my_name){
-				return {"origin_country": border_country_name, "destination_country": enemy_countries[enemy_country_index]};
+				return {"destination_country": border_country_name, "origin_country": origin_country_name};
 			}
 		}
-		my_countries.splice(enemy_country_index, 1);
+		delete my_countries[origin_country_name];
 	}
 }
 
@@ -207,6 +206,9 @@ function chooseAction(you, game){
 		}
 		if(you.available_actions[i] == "end_attack_phase"){
 			return "end_attack_phase";
+		}
+		if(you.available_actions[i] == "pass"){
+			return "pass";
 		}
 	}
 }
