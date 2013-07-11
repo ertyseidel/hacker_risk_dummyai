@@ -65,6 +65,7 @@ function respond(req, res){
 		} else if(action == "deploy_troops"){
 			var countries_to_deploy_to = {};
 			var my_countries = getOurCountries(game, 0);
+			console.log(my_countries);
 			for(var k = 0; k < you.troops_to_deploy; k++){
 				var country_choice = my_countries[Object.keys(my_countries)[Math.floor(Object.keys(my_countries).length * Math.random())]].name;
 				if(typeof(countries_to_deploy_to[country_choice]) == "undefined"){
@@ -105,8 +106,10 @@ function getOurCountries(game, min_num_troops){
 	var our_countries = {};
 	for(var country_index in game.countries){
 		if(game.countries[country_index].owner == my_name && game.countries[country_index].troops >= min_troops){
-			our_countries[game.countries[country_index].name] = game.countries[country_index];
-			our_countries[game.countries[country_index].name].border_countries = board_graph_countries[game.countries[country_index].name]["border countries"];
+			our_countries[country_index] = game.countries[country_index];
+			console.log(board_graph_countries);
+			console.log(country_index);
+			our_countries[country_index].border_countries = board_graph_countries[country_index].border_countries;
 		}
 	}
 	return our_countries;
