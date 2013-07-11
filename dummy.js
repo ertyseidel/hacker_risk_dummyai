@@ -67,7 +67,7 @@ function respond(req, res){
 			response.data = countries[Math.floor(Math.random()*countries.length)].name;
 		} else if(action == "deploy_troops"){
 			var countries_to_deploy_to = {};
-			var my_countries = getOurCountries(game, 0);
+			var my_countries = getMyCountries(game, 0);
 			for(var k = 0; k < you.troops_to_deploy; k++){
 				var country_choice = Object.keys(my_countries)[Math.floor(Math.random() * Object.keys(my_countries).length)];
 				if(typeof(countries_to_deploy_to[country_choice]) == "undefined"){
@@ -92,6 +92,7 @@ function respond(req, res){
 							"moving_troops": Math.max(0, game.countries[attacked_this_turn['attacking_country']].troops - 2)};
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
+			response.data.moving_troops = game.countries[response.data['origin_country']].troops - 1;
 		} else if(action == "end_turn" || action == "end_attack_phase"){
 			//pass
 		}
@@ -104,7 +105,7 @@ function respond(req, res){
 	}
 }
 
-function getOurCountries(game, min_num_troops){
+function getMyCountries(game, min_num_troops){
 	var min_troops = typeof(min_num_troops) == "undefined" ? 0 : min_num_troops;
 	var our_countries = {};
 	for(var country_index in game.countries){
@@ -117,25 +118,23 @@ function getOurCountries(game, min_num_troops){
 }
 
 function findReinforce(game){
-	var our_countries = getOurCountries(game, 2);
-	var potential_destination_countries = our_countries.slice(0);
-	var response = false;
-	while(response === false){
-		var origin_index = Object.keys(our_countries)[Math.floor(Math.random() * Object.keys(our_countries).length)];
-		for(var border_country in our_countries[origin_index].border_countries){
-			if(typeof(potential_destination_countries[border_country]) !== "undefined"){
-				response = {"origin_country": origin_index, "destination_country": potential_destination_countries[border_country].name, "moving_troops": our_countries[origin_index].troops - 1};
+	var my_countries = getMyCountries(game, 2);
+	while(true){
+		var origin_country_name = Object.keys(my_countries)[Math.floor(Math.random() * Object.keys(my_countries).length)];
+		for(var border_country_index in board_graph_countries[origin_country_name]["border countries"]){
+			var border_country_name = board_graph_countries[origin_country_name]["border countries"][border_country_index];
+			if(game.countries[border_country_name].owner == my_name){
+				return {"origin_country": border_country_name, "destination_country": enemy_countries[enemy_country_index]};
 			}
 		}
-		delete our_countries[origin_index];
+		my_countries.splice(enemy_country_index, 1);
 	}
-	return response;
 }
 
 function findAttack(game){
 	var enemy_countries = []; //enemy countries
 	for(var potential_enemy_name in board_graph_countries){
-		if(game.countries[border_country_name].owner == my_name){
+		if(game.countries[potential_enemy_name].owner != my_name){
 			enemy_countries.push(potential_enemy_name);
 		}
 	}
