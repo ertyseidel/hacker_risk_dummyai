@@ -74,8 +74,8 @@ function respond(req, res){
 					countries_to_deploy_to[country_choice] ++;
 				}
 			}
-			for(var m = 0; m < Object.keys(countries_to_deploy_to).length; m ++){
-				response.data[Object.keys(countries_to_deploy_to)[m]] = countries_to_deploy_to[Object.keys(countries_to_deploy_to)];
+			for(var m in countries_to_deploy_to){
+				response.data[m] = countries_to_deploy_to[m];
 			}
 		} else if(action == "use_cards"){
 			response.data = findCards(you.cards, []);
