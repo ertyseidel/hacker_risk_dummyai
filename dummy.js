@@ -86,7 +86,7 @@ function respond(req, res){
 			response.data = {"attacking_country": attacked_this_turn["attacking_country"],
 							"defending_country": attacked_this_turn["defending_country"],
 							"attacking_troops": 1,
-							"moving_troops": attacked_this_turn['attacking_country'].troops - 1};
+							"moving_troops": board_graph_countries[attacked_this_turn['attacking_country']].troops - 1};
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
 		} else if(action == "end turn" || action == "pass"){
@@ -132,18 +132,17 @@ function findReinforce(game){
 function findAttack(game){
 	var our_countries = getOurCountries(game, 2);
 	var enemy_countries = []; //enemy countries
-	for(var enemy_country_index in board_graph_countries){
-		if(typeof(our_countries[enemy_country_index]) == "undefined"){
-			board_graph_countries[enemy_country_index].name = enemy_country_index;
-			enemy_countries.push(board_graph_countries[enemy_country_index]);
+	for(var potential_enemy_name in board_graph_countries){
+		if(typeof(our_countries[potential_enemy_name]) == "undefined"){
+			enemy_countries.push(potential_enemy_name);
 		}
 	}
 	var response = false;
 	while(response === false){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
-		for(var border_country_index in enemy_countries[enemy_country_index]["border countries"]){
-			if(typeof(our_countries[enemy_countries[enemy_country_index]["border countries"][border_country_index]] !== "undefined")){
-				response = {"attacking_country": enemy_countries[enemy_country_index]["border countries"][border_country_index].name, "defending_country": enemy_countries[enemy_country_index].name};
+		for(var border_country_index in board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]){
+			if(typeof(our_countries[border_country_index] !== "undefined")){
+				response = {"attacking_country": border_country_index, "defending_country": enemy_countries[enemy_country_index]};
 			}
 		}
 		enemy_countries.splice(enemy_country_index, 1);
