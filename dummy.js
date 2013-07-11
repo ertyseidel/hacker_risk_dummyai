@@ -93,7 +93,7 @@ function respond(req, res){
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
 			if(response.data === undefined){
-				reponse.action = "end_turn"; //TODO remove this when Eric gets the reinforce checker working
+				response.action = "end_turn"; //TODO remove this when Eric gets the reinforce checker working
 			} else {
 				response.data.moving_troops = game.countries[response.data['origin_country']].troops - 1;
 			}
