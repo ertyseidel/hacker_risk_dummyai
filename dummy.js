@@ -3,10 +3,11 @@ var fs = require('fs');
 
 var attacked_this_turn = false;
 var board_graph = JSON.parse(fs.readFileSync("./board_graph.json"));
+
 var board_graph_countries = {};
 for (var bg_continents in board_graph){
-	for(var bg_countries in board_graph[bg_continents]){
-		board_graph_countries[board_graph[bg_continents][bg_countries].name] = board_graph[bg_continents][bg_countries];
+	for(var bg_countries in board_graph[bg_continents].countries){
+		board_graph_countries[bg_countries] = board_graph[bg_continents].countries[bg_countries];
 	}
 }
 
