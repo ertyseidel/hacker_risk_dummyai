@@ -122,7 +122,7 @@ function findReinforce(game){
 		var origin_country_name = Object.keys(my_countries)[Math.floor(Math.random() * Object.keys(my_countries).length)];
 		for(var border_country_index in board_graph_countries[origin_country_name]["border countries"]){
 			var border_country_name = board_graph_countries[origin_country_name]["border countries"][border_country_index];
-			if(game.countries[border_country_name].owner == my_name && game.countries[border_country_name].troops > 1){
+			if(game.countries[border_country_name].owner == my_name){
 				return {"destination_country": border_country_name, "origin_country": origin_country_name};
 			}
 		}
@@ -141,7 +141,7 @@ function findAttack(game){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
 		for(var border_country_index in board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]){
 			var border_country_name = board_graph_countries[enemy_countries[enemy_country_index]]["border countries"][border_country_index];
-			if(game.countries[border_country_name].owner == my_name){
+			if(game.countries[border_country_name].owner == my_name && game.countries[border_country_name].troops > 1){
 				return {"attacking_country": border_country_name, "defending_country": enemy_countries[enemy_country_index]};
 			}
 		}
