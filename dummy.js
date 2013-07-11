@@ -47,6 +47,7 @@ function respond(req, res){
 		var game = req.body.game;
 		var you = req.body.you;
 		my_name = you.name;
+		console.log("I am " + my_name);
 
 		var action = chooseAction(you, game);
 
@@ -88,7 +89,7 @@ function respond(req, res){
 			response.data = {"attacking_country": attacked_this_turn["attacking_country"],
 							"defending_country": attacked_this_turn["defending_country"],
 							"attacking_troops": 1,
-							"moving_troops": game.countries[attacked_this_turn['attacking_country']].troops - 2};
+							"moving_troops": Math.max(0, game.countries[attacked_this_turn['attacking_country']].troops - 2});
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
 		} else if(action == "end_turn" || action == "end_attack_phase"){
