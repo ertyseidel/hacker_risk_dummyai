@@ -66,7 +66,6 @@ function respond(req, res){
 		} else if(action == "deploy_troops"){
 			var countries_to_deploy_to = {};
 			var my_countries = getOurCountries(game, 0);
-			console.log(my_countries);
 			for(var k = 0; k < you.troops_to_deploy; k++){
 				var country_choice = my_countries[Object.keys(my_countries)[Math.floor(Object.keys(my_countries).length * Math.random())]].name;
 				if(typeof(countries_to_deploy_to[country_choice]) == "undefined"){
@@ -76,7 +75,7 @@ function respond(req, res){
 				}
 			}
 			for(var m = 0; m < Object.keys(countries_to_deploy_to).length; m ++){
-				response.data[Object.keys(countries_to_deploy_to)[m]] = countries_to_deploy_to[Object.keys(countries_to_deploy_to)];
+				response.data[Object.keys(countries_to_deploy_to)[m].name = countries_to_deploy_to[Object.keys(countries_to_deploy_to)];
 			}
 		} else if(action == "use_cards"){
 			response.data = findCards(you.cards, []);
