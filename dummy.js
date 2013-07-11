@@ -118,7 +118,7 @@ function getMyCountries(game, min_num_troops){
 
 function findReinforce(game){
 	var my_countries = getMyCountries(game, 2);
-	while(true){
+	while(Object.keys(my_countries).length > 0){
 		var origin_country_name = Object.keys(my_countries)[Math.floor(Math.random() * Object.keys(my_countries).length)];
 		for(var border_country_index in board_graph_countries[origin_country_name]["border countries"]){
 			var border_country_name = board_graph_countries[origin_country_name]["border countries"][border_country_index];
