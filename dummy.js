@@ -3,9 +3,16 @@ var fs = require('fs');
 
 var attacked_this_turn = false;
 var board_graph = JSON.parse(fs.readFileSync("./board_graph.json"));
+var board_graph_countries = {};
+for (var bg_continents in board_graph){
+	for(var bg_countries in board_graph[bg_continents]){
+		board_graph_countries[board_graph[bg_continents][bg_countries].name] = board_graph[bg_continents][bg_countries];
+	}
+}
 
 var serverCreated = false;
 var serverPort = process.argv[2];
+var my_name;
 
 var serverFunction = function (req, res) {
 	console.log("------REQUEST-----");
@@ -38,6 +45,7 @@ function respond(req, res){
 		res.writeHead(200, {'Content-Type': 'text/json'});
 		var game = req.body.game;
 		var you = req.body.you;
+		my_name = you.name;
 
 		var action = chooseAction(you, game);
 
@@ -47,17 +55,27 @@ function respond(req, res){
 
 		if(action == "choose_country"){
 			var countries = [];
-			for(var i in game.continents){
-				for(var j in game.continents[i].countries){
-					if(game.continents[i].countries[j].owner === null){
-						game.continents[i].countries[j].name = j;
-						countries.push(game.continents[i].countries[j]);
-					}
+			for(var i in game.countries){
+				if(game.countries[i].owner == 'none'){
+					game.countries[i].name = i;
+					countries.push(game.countries[i]);
 				}
 			}
 			response.data = countries[Math.floor(Math.random()*countries.length)].name;
 		} else if(action == "deploy_troops"){
-			//TODO START HERE
+			var countries_to_deploy_to = {};
+			var my_countries = getOurCountries(game, 0);
+			for(var k = 0; k < you.troops_to_deploy; k++){
+				var country_choice = my_countries[Object.keys(my_countries)[Math.floor(Object.keys(my_countries).length * Math.random())]].name;
+				if(typeof(countries_to_deploy_to[country_choice]) == "undefined"){
+					countries_to_deploy_to[country_choice] = 1;
+				} else{
+					countries_to_deploy_to[country_choice] ++;
+				}
+			}
+			for(var m = 0; m < Object.keys(countries_to_deploy_to).length; m ++){
+				response.data[Object.keys(countries_to_deploy_to)[m]] = countries_to_deploy_to[Object.keys(countries_to_deploy_to)];
+			}
 		} else if(action == "use_cards"){
 			response.data = findCards(you.cards, []);
 		} else if(action == "attack"){
@@ -82,20 +100,20 @@ function respond(req, res){
 	}
 }
 
-function getOurCountriesWithMoreThanOneTroop(game){
+function getOurCountries(game, min_num_troops){
+	var min_troops = typeof(min_num_troops) == "undefined" ? 0 : min_num_troops;
 	var our_countries = {};
-	for(var continent_index in game.continents){
-		for(var country_index in game.continents[continent_index].countries){
-			if(game.continents[continent_index].countries[country_index].owner == you.name && game.continents[continent_index].countries[country_index].troops >= 2){
-				our_countries[game.continents[continent_index].countries[country_index].name] = game.continents[continent_index].countries[country_index];
-				our_countries[game.continents[continent_index].countries[country_index].name].border_countries = board_graph[game.continents[continent_index].name][game.continents[continent_index].countries[country_index].name]["border countries"];
-			}
+	for(var country_index in game.countries){
+		if(game.countries[country_index].owner == my_name && game.countries[country_index].troops >= min_troops){
+			our_countries[game.countries[country_index].name] = game.countries[country_index];
+			our_countries[game.countries[country_index].name].border_countries = board_graph_countries[game.countries[country_index].name]["border countries"];
 		}
 	}
+	return our_countries;
 }
 
 function findReinforce(game){
-	var our_countries = getOurCountriesWithMoreThanOneTroop();
+	var our_countries = getOurCountries(game, 2);
 	var potential_destination_countries = our_countries.slice(0);
 	var response = false;
 	while(response === false){
@@ -111,13 +129,11 @@ function findReinforce(game){
 }
 
 function findAttack(game){
-	var our_countries = getOurCountriesWithMoreThanOneTroop(game);
+	var our_countries = getOurCountries(game, 2);
 	var enemy_countries = []; //enemy countries
-	for(var enemy_continent_index in board_graph){
-		for(var enemy_country_index in board_graph[enemy_continent_index].countries){
-			if(typeof(our_countries[board_graph[enemy_continent_index].countries[enemy_country_index]]) == "undefined"){
-				enemy_countries.push(our_countries[board_graph[enemy_continent_index].countries[enemy_country_index]]);
-			}
+	for(var enemy_country_index in board_graph_countries){
+		if(typeof(our_countries[board_graph_countries[enemy_country_index]]) == "undefined"){
+			enemy_countries.push(our_countries[board_graph_countries[enemy_country_index]]);
 		}
 	}
 	var response = false;
@@ -175,7 +191,7 @@ function chooseAction(you, game){
 		if(you.available_actions[i] == "attack" &&
 			(attacked_this_turn === false ||
 				(attacked_this_turn['attacking_country'].troops > 1 &&
-				attacked_this_turn["defending_country"].owner != you.name)
+				attacked_this_turn["defending_country"].owner != my_name)
 			)
 		){
 			return "attack";
