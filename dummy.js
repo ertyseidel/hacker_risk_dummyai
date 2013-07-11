@@ -92,7 +92,11 @@ function respond(req, res){
 							"moving_troops": Math.max(0, game.countries[attacked_this_turn['attacking_country']].troops - 2)};
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
-			response.data.moving_troops = game.countries[response.data['origin_country']].troops - 1;
+			if(response.data === undefined){
+				reponse.action = "end_turn"; //TODO remove this when Eric gets the reinforce checker working
+			} else {
+				response.data.moving_troops = game.countries[response.data['origin_country']].troops - 1;
+			}
 		} else if(action == "end_turn" || action == "end_attack_phase" || action == "pass"){
 			//pass
 		}
