@@ -89,7 +89,7 @@ function respond(req, res){
 			response.data = {"attacking_country": attacked_this_turn["attacking_country"],
 							"defending_country": attacked_this_turn["defending_country"],
 							"attacking_troops": 1,
-							"moving_troops": Math.max(0, game.countries[attacked_this_turn['attacking_country']].troops - 2});
+							"moving_troops": Math.max(0, game.countries[attacked_this_turn['attacking_country']].troops - 2)};
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
 		} else if(action == "end_turn" || action == "end_attack_phase"){
@@ -110,7 +110,7 @@ function getOurCountries(game, min_num_troops){
 	for(var country_index in game.countries){
 		if(game.countries[country_index].owner == my_name && game.countries[country_index].troops >= min_troops){
 			our_countries[country_index] = game.countries[country_index];
-			our_countries[country_index].border_countries = board_graph_countries[country_index].border_countries;
+			our_countries[country_index]["border countries"] = board_graph_countries[country_index]["border countries"];
 		}
 	}
 	return our_countries;
@@ -133,25 +133,22 @@ function findReinforce(game){
 }
 
 function findAttack(game){
-	var our_countries = getOurCountries(game, 2);
 	var enemy_countries = []; //enemy countries
 	for(var potential_enemy_name in board_graph_countries){
 		if(typeof(our_countries[potential_enemy_name]) == "undefined"){
 			enemy_countries.push(potential_enemy_name);
 		}
 	}
-	var response = false;
-	while(response === false){
+	while(true){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
 		for(var border_country_index in board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]){
 			var border_country_name = board_graph_countries[enemy_countries[enemy_country_index]]["border countries"][border_country_index];
-			if(typeof(our_countries[border_country_name] !== "undefined")){
-				response = {"attacking_country": border_country_name, "defending_country": enemy_countries[enemy_country_index]};
+			if(game.countries[border_country_name].owner == my_name){
+				return {"attacking_country": border_country_name, "defending_country": enemy_countries[enemy_country_index]};
 			}
 		}
 		enemy_countries.splice(enemy_country_index, 1);
 	}
-	return response;
 }
 
 function findCards(cards, set){
@@ -209,8 +206,8 @@ function chooseAction(you, game){
 			attacked_this_turn = false;
 			return "end_turn";
 		}
-		if(you.available_actions[i] == "pass"){
-			return "pass";
+		if(you.available_actions[i] == "end_attack_phase"){
+			return "end_attack_phase";
 		}
 	}
 }
