@@ -86,7 +86,7 @@ function respond(req, res){
 			response.data = {"attacking_country": attacked_this_turn["attacking_country"],
 							"defending_country": attacked_this_turn["defending_country"],
 							"attacking_troops": 1,
-							"moving_troops": board_graph_countries[attacked_this_turn['attacking_country']].troops - 1};
+							"moving_troops": game.countries[attacked_this_turn['attacking_country']].troops - 1};
 		} else if(action == "reinforce"){
 			response.data = findReinforce(game);
 		} else if(action == "end turn" || action == "pass"){
@@ -140,7 +140,9 @@ function findAttack(game){
 	var response = false;
 	while(response === false){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
+		console.log(board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]);
 		for(var border_country_index in board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]){
+			console.log(border_country_index);
 			if(typeof(our_countries[border_country_index] !== "undefined")){
 				response = {"attacking_country": border_country_index, "defending_country": enemy_countries[enemy_country_index]};
 			}
