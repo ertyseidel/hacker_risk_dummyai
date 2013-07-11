@@ -135,7 +135,7 @@ function findReinforce(game){
 function findAttack(game){
 	var enemy_countries = []; //enemy countries
 	for(var potential_enemy_name in board_graph_countries){
-		if(typeof(our_countries[potential_enemy_name]) == "undefined"){
+		if(game.countries[border_country_name].owner == my_name){
 			enemy_countries.push(potential_enemy_name);
 		}
 	}
