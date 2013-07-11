@@ -79,7 +79,7 @@ function respond(req, res){
 			for(var m in countries_to_deploy_to){
 				response.data[m] = countries_to_deploy_to[m];
 			}
-		} else if(action == "use_cards"){
+		} else if(action == "spend_cards"){
 			response.data = findCards(you.cards, []);
 		} else if(action == "attack"){
 			if(attacked_this_turn === false){
@@ -154,7 +154,7 @@ function findCards(cards, set){
 		for (var j = i + 1; j < cards.length - 1; j++){
 			for (var k = j + 1; k < cards.length; k++){
 				if(isCardSet([cards[i], cards[j], cards[k]])){
-					return([cards[i].country, cards[j].country, cards[k].country]);
+					return([cards[i].country_name, cards[j].country_name, cards[k].country_name]);
 				}
 			}
 		}
@@ -166,7 +166,7 @@ function isCardSet(set){
 	for(var i = 0; i < set.length ; i++){
 		if(set[i].value == "wild") return true;
 	}
-	return(set[0].value == set[1].value == set[2].value || set[0].value != set[1].value != set[2].value);
+	return(set[0].value == set[1].value && set[1].value == set[2].value) || (set[0].value != set[1].value && set[1].value != set[2].value && set[0].value != set[2].value);
 }
 
 function chooseAction(you, game){
@@ -174,8 +174,8 @@ function chooseAction(you, game){
 		if(you.available_actions[i] == "choose_country"){
 			return "choose_country";
 		}
-		if(you.available_actions[i] == "use_cards" && you.cards.length >= 5){
-			return "use_cards";
+		if(you.available_actions[i] == "spend_cards" && you.cards.length >= 5){
+			return "spend_cards";
 		}
 		if(you.available_actions[i] == "deploy_troops"){
 			return "deploy_troops";
