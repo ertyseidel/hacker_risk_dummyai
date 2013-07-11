@@ -140,11 +140,9 @@ function findAttack(game){
 	var response = false;
 	while(response === false){
 		var enemy_country_index = Math.floor(Math.random() * enemy_countries.length);
-		console.log(board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]);
 		for(var border_country_index in board_graph_countries[enemy_countries[enemy_country_index]]["border countries"]){
-			console.log(border_country_index);
 			if(typeof(our_countries[border_country_index] !== "undefined")){
-				response = {"attacking_country": border_country_index, "defending_country": enemy_countries[enemy_country_index]};
+				response = {"attacking_country": board_graph_countries[enemy_countries[enemy_country_index]]["border countries"][border_country_index], "defending_country": enemy_countries[enemy_country_index]};
 			}
 		}
 		enemy_countries.splice(enemy_country_index, 1);
