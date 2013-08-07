@@ -21,11 +21,11 @@ var serverFunction = function (req, res) {
 
 	if(req.method == "POST"){
 		req.on('data', function(chunk) {
-			body += chunk;
+		      body += chunk;
 		});
 
 		req.on('end', function() {
-			body = JSON.parse(decodeURIComponent(body).substring(5).replace(/\+/g, " "));
+		        body = JSON.parse(body);
 			req.body = body;
 			respond(req, res);
 		});
